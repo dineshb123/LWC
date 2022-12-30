@@ -1,0 +1,8 @@
+ Database.SaveResult[] srList = Database.insert(oppList,false);
+        for(Integer i=0; i<srList.size();i++){
+            if(!srList[i].isSuccess()){
+                string errors = 'This Field iS Missing';
+                for(Database.Error err : srList[i].getErrors()){
+                    errors = errors +err.getMessage();
+                }
+                        acclist[i].addError(errors);
