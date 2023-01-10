@@ -1,0 +1,20 @@
+===================HTML=====================
+<template>
+  ==========First Way   for-Each================
+  <template for:each={cities} for:item="ea">
+  <P key={ea}> {ea} </P>
+</template>
+================Second way Ietrator===================
+<template  iterator:item={cities}>
+    <P key={item.value}> {item.value} </P>
+  </template>  
+</template>
+
+
+=============================JS=========================
+
+import { LightningElement } from 'lwc';
+
+export default class Array_Data_Type_In_Lwc extends LightningElement {
+    cities=['HYD','Pune','MUM'];
+}
