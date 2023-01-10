@@ -1,1 +1,64 @@
 
+<template>
+    <lightning-card title="Calculator">
+        <lightning-layout>
+            <lightning-layout-item>
+        <lightning-input type="number" label="Enter First number" name="aval" onchange={callme1} > </lightning-input>
+        <lightning-input type="number" label="Enter Second number" name="bval" onchange={callme1}> </lightning-input>
+
+        <lightning-button label="Add" onclick={addme}> </lightning-button>
+        <lightning-button label="Subtract" onclick={Sub}> </lightning-button>
+        <lightning-button label="Multiply" onclick={Mul}> </lightning-button>
+        <div>
+            Result :{resvalue}
+        </div>
+    </lightning-layout-item>
+    </lightning-layout>
+    </lightning-card>
+    
+</template>
+
+
+
+======================================================JS=========================================
+import { LightningElement,track } from 'lwc';
+
+export default class Day_3 extends LightningElement {
+
+@track resvalue
+num1;
+num2;
+callme1(event)
+{
+    const evtname = event.target.name;//Where The change Event Has Occurer
+    if(evtname=='aval')
+    {
+    this.num1 = event.target.value
+    }
+    
+    else{
+  this.num2=event.target.value  
+
+      }
+}
+addme (){
+    const a = parseInt(this.num1);
+    const b = parseInt(this.num2);
+    this.resvalue = 'Sum Of Given Number is' + (a+b);
+
+}
+Sub(){
+    const a = parseInt(this.num1);
+    const b = parseInt(this.num2);
+    this.resvalue = 'Sum Of Given Number is' + (a-b);
+
+}
+Mul(){
+    const a = parseInt(this.num1);
+    const b = parseInt(this.num2);
+    this.resvalue = 'Sum Of Given Number is' + (a*b);
+
+}
+
+
+}
