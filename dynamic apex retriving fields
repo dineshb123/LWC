@@ -1,3 +1,11 @@
+<!-- 
+  @description       : 
+  @author            : ChangeMeIn@UserSettingsUnder.SFDoc
+  @group             : 
+  @last modified on  : 02-08-2023
+  @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
+ -->
+
 <template>
   <lightning-card>
                 <lightning-button class="slds-p-around_medium slds-p-bottom_medium" label={objectApiName}
@@ -30,25 +38,21 @@
                 </template>
             </template>
          </td>
-         <td  class="slds-cell-wrap" style="word-break: break-all;" scope="row">
-            <template if:true={areDetailsVisible1}>
+         <td  class="slds-cell-wrap" style="word-break: break-all;">
+            <!-- <template if:true={areDetailsVisible1}>
                   <template for:each={fieldsData} for:item="val" for:index="index">       
                         <p key={val.Id} >{val}</p>
                    </template>
-              </template>
+              </template> -->
               {fieldsData}
           </td>
 
-          <!-- <tr>
-            <th class="slds-cell-wrap" style="word-break: break-all;" scope="row"></th>
-            <td> {fieldsData}</td>
-        </tr> -->
+          
     
         </tbody>
       </table>
   </lightning-card>
 </template>
-
 
 
 
