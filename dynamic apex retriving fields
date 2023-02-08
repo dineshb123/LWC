@@ -1,0 +1,56 @@
+<template>
+    <lightning-card>
+                <!-- <lightning-input type="text" 
+                                 label="Enter Parent object name" 
+                                 value={masterObjectName1} 
+                                 onchange={handleKeyChange}>
+                </lightning-input>    -->
+
+                <lightning-button label={objectApiName}
+                                  onclick={handleSearch}>
+                </lightning-button>
+
+                <template if:true={areDetailsVisible}>
+                    <template for:each={resultData} for:item="val" for:index="index">
+                            <p key={val.Id}>{val}
+                            </p>
+                    </template>
+                </template>
+
+        
+    </lightning-card>
+</template>
+
+
+
+
+
+import { LightningElement,wire,api,track } from 'lwc';
+import { getObjectInfo } from 'lightning/uiObjectInfoApi';
+import getRelatedObjects from '@salesforce/apex/dynamicApexForFindChildRelationship.getRelatedObjects';
+export default class dynamicapex extends LightningElement {
+    @api objectApiName;
+        masterObjectName = '';
+    contacts;
+    error;
+    areDetailsVisible =false;
+    @track resultData = [];
+    handleKeyChange(event) {
+       this.masterObjectName1 = event.target.value;
+        console.log('result is'+ this.masterObjectName1);
+    }
+
+    handleSearch() {
+        this.areDetailsVisible=true
+        getRelatedObjects({ masterObjectName: this.objectApiName})
+            .then((result) => {
+                this.resultData = result;
+                console.log('result is'+result);               
+            })
+            .catch((error) => {
+                this.error = error;
+                this.contacts = undefined;
+            });
+    }
+}
+ 
