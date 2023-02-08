@@ -1,48 +1,82 @@
 <template>
-    <lightning-card>
-                <!-- <lightning-input type="text" 
-                                 label="Enter Parent object name" 
-                                 value={masterObjectName1} 
-                                 onchange={handleKeyChange}>
-                </lightning-input>    -->
-
-                <lightning-button label={objectApiName}
-                                  onclick={handleSearch}>
+  <lightning-card>
+                <lightning-button class="slds-p-around_medium slds-p-bottom_medium" label={objectApiName}
+                                    onclick={handleSearch}>
                 </lightning-button>
 
-                <template if:true={areDetailsVisible}>
-                    <template for:each={resultData} for:item="val" for:index="index">
-                            <p key={val.Id}>{val}
-                            </p>
-                    </template>
+     <table class="slds-table slds-table_cell-buffer slds-table_bordered"  >
+       <thead>
+        <tr class="slds-line-height_reset">
+              <th class="" scope="col">
+                  <div class="slds-truncate" title="Name">Child Object Name</div>
+              </th>
+              <th class="" scope="col">
+                    <div class="slds-truncate" title="First Name">Child Object Fields</div>
+              </th>
+          </tr>
+       </thead>
+            
+        <tbody>
+                        
+         <td>
+            <template if:true={areDetailsVisible}>
+                <template for:each={resultData} for:item="val" for:index="index">
+                      <p key={val.Id} >
+                            <lightning-button    variant="base" label={val}
+                                                 onclick={getFields} value={val}>
+                                                 {val}
+                            </lightning-button>      
+                      </p>
                 </template>
+            </template>
+         </td>
+         <td  class="slds-cell-wrap" style="word-break: break-all;" scope="row">
+            <template if:true={areDetailsVisible1}>
+                  <template for:each={fieldsData} for:item="val" for:index="index">       
+                        <p key={val.Id} >{val}</p>
+                   </template>
+              </template>
+              {fieldsData}
+          </td>
 
-        
-    </lightning-card>
+          <!-- <tr>
+            <th class="slds-cell-wrap" style="word-break: break-all;" scope="row"></th>
+            <td> {fieldsData}</td>
+        </tr> -->
+    
+        </tbody>
+      </table>
+  </lightning-card>
 </template>
 
 
 
 
-
 import { LightningElement,wire,api,track } from 'lwc';
-import { getObjectInfo } from 'lightning/uiObjectInfoApi';
 import getRelatedObjects from '@salesforce/apex/dynamicApexForFindChildRelationship.getRelatedObjects';
+import getObjectFields from '@salesforce/apex/dynamicApexForFindChildRelationship.getObjectFields';
+
+
 export default class dynamicapex extends LightningElement {
     @api objectApiName;
         masterObjectName = '';
+        masterObjectName1 = '';
     contacts;
     error;
+    val;
     areDetailsVisible =false;
+    areDetailsVisible1=false;
     @track resultData = [];
+    @track fieldsData =[];
+    
     handleKeyChange(event) {
        this.masterObjectName1 = event.target.value;
         console.log('result is'+ this.masterObjectName1);
     }
-
+    
     handleSearch() {
-        this.areDetailsVisible=true
-        getRelatedObjects({ masterObjectName: this.objectApiName})
+        this.areDetailsVisible=true;
+        getRelatedObjects({masterObjectName: this.objectApiName})
             .then((result) => {
                 this.resultData = result;
                 console.log('result is'+result);               
@@ -51,6 +85,31 @@ export default class dynamicapex extends LightningElement {
                 this.error = error;
                 this.contacts = undefined;
             });
+
+            
     }
+
+    getFields(event){
+      const val=event.target.value;
+       //this.fieldsData=val.value;
+       console.log('result is'+ val);
+       this.areDetailsVisible1=true;
+        getObjectFields({ objectName : val})
+        .then((result) => {
+            this.fieldsData = result;
+            console.log('result is'+result);               
+        })
+        .catch((error) => {
+            this.error = error;
+            this.contacts = undefined;
+        });
+
+
+                
+    }
+
+
 }
+    
  
+   
