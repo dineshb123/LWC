@@ -1,0 +1,235 @@
+<!--
+  @description       : 
+  @author            : ChangeMeIn@UserSettingsUnder.SFDoc
+  @group             : 
+  @last modified on  : 02-14-2023
+  @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
+-->
+<template>
+    <lightning-card>
+      <lightning-layout multiple-row-size="12">
+        <lightning-layout-item size="12" small-device-size="6" medium-device-size="6" large-device-size="6" class="slds-p-around_medium">       
+          <lightning-combobox
+                                name="progress"
+                                label="objects"
+                                value={value}
+                                placeholder="Select Object"
+                                options={objects}
+                                onchange={getFields} >
+          </lightning-combobox>
+       </lightning-layout-item>
+       <lightning-layout-item size="12" small-device-size="2" medium-device-size="2" large-device-size="2" class="slds-p-around_medium">       
+          <lightning-combobox
+                                name="progress"
+                                label="Sort Result By"
+                                value={value}
+                                placeholder="Select fields"
+                                options={sortByList}
+                                >
+            </lightning-combobox>
+       </lightning-layout-item>
+       <lightning-layout-item size="12" small-device-size="2" medium-device-size="2" large-device-size="2" class="slds-p-around_medium">       
+        <lightning-combobox
+                            name="progress"
+                            label="Sort by"
+                            value={value}
+                            placeholder="Select Progress"
+                            options={fieldsData}
+                            onchange={handleChange1} >
+         </lightning-combobox>
+        </lightning-layout-item>
+        <lightning-layout-item size="12" small-device-size="2" medium-device-size="2" large-device-size="2" class="slds-p-around_medium">       
+            <lightning-input label="Max Records"> Max Record
+            </lightning-input>
+        </lightning-layout-item>
+        </lightning-layout>
+        <lightning-layout>
+          <lightning-layout-item size="12" small-device-size="6" medium-device-size="6" large-device-size="6" class="slds-p-around_medium">       
+            <lightning-dual-listbox
+                        name="Fields" class="slds-m-around_small" 
+                        label="Select Fields"
+                        source-label="Available"
+                        selected-label="Selected"
+                        field-level-help="Select your preferred Fields"
+                        options={fieldsData} value={_selected} onchange={getFields1}>
+            </lightning-dual-listbox>
+          </lightning-layout-item>
+          <lightning-layout-item size="12" small-device-size="2" medium-device-size="2" large-device-size="2" class="slds-p-around_medium">       
+                <lightning-combobox
+                                  name="progress"
+                                  label="Filter Result By"
+                                  value={value}
+                                  placeholder="Select fields"
+                                  options={filterByList}>
+                </lightning-combobox>
+          </lightning-layout-item>
+          <lightning-layout-item size="12" small-device-size="2" medium-device-size="2" large-device-size="2" class="slds-p-around_medium">       
+            <lightning-combobox
+                          name="Filter"
+                          label="Filter By"
+                          value={value1}
+                          placeholder="Select "
+                          options={options2}
+                          onchange={handleChange2} >
+            </lightning-combobox>
+          </lightning-layout-item>
+          <lightning-layout-item size="12" small-device-size="2" medium-device-size="2" large-device-size="2" class="slds-p-around_medium">       
+            <lightning-input
+                          label="Limit"> Filter
+            </lightning-input>
+          </lightning-layout-item>
+        </lightning-layout>
+            
+          <lightning-textarea value={queryvalue} class="slds-p-around_medium"></lightning-textarea>
+          <lightning-button label="Query" title="Query" onclick={showDatatable} class="slds-p-around_medium"></lightning-button>
+          <template if:true={DataTableVisible}>
+          <lightning-datatable
+                          key-field="id"
+                          data={data}
+                          columns={queryColum}>
+                  </lightning-datatable>
+                </template>
+    </lightning-card>
+</template>
+
+
+
+
+import { LightningElement,track } from 'lwc';
+import getAllObject from '@salesforce/apex/WorkbenchApp.getAllObject';
+import getAllFields from '@salesforce/apex/WorkbenchApp.getAllFields';
+import getQuery from '@salesforce/apex/WorkbenchApp.getQuery';
+
+
+
+export default class Workbenchdynamicway extends LightningElement {
+    @track sortByList =[];
+    @track filterByList = [];
+    @track selectedObj;
+   @track fieldsdataofdrop =[];
+   @track data=[];
+    @track objects;
+    @track error;
+    objectName;
+    queryvalue;
+    _selected = [];
+    DataTableVisible=false;
+
+   @track queryData=[];
+    @track queryColum =[];
+    connectedCallback(){
+        
+        getAllObject()
+.then(result => { 
+    this.objects =[];
+    
+    console.log(JSON.stringify(result));
+    for(let key in result) {
+        if (result.hasOwnProperty(key)) { 
+            console.log('Key > ',JSON.stringify(result[key]));
+            this.objects.push({ label:key ,value:key});
+        }
+    }
+})
+.catch(error => {
+    this.error = error;
+}); 
+}
+        
+@track fieldsData =[];
+getFields(event){
+    this.fieldsData =[];
+    this._selected=[];
+    this.objectName = event.target.value;
+    console.log('Objects > ',JSON.stringify(this.objectName));
+    getAllFields({ objectName : this.objectName})
+      .then((result) => {
+       // this.fieldsData = [];
+         for(let key in result) {
+             if (result.hasOwnProperty(key)) { 
+                 this.fieldsData.push({ label:key ,value:key});
+             }
+         }          
+         this.sortByList = this.fieldsData;
+         this.filterByList = this.fieldsData; 
+      })
+      .catch((error) => {
+          this.error = error;
+          this.contacts = undefined;
+      });
+}
+
+    get selected(){
+        return this._selected.length ? this._selected : 'none';
+        }
+
+        getFields1(event){
+            
+            this.fieldsdataofdrop = event.target.value;
+            console.log('selected fields > ',JSON.stringify(this.fieldsdataofdrop));
+            this.queryvalue = 'Select '+this.fieldsdataofdrop+' from '+this.objectName;
+
+            for(let key in this.fieldsdataofdrop) {  
+                console.log('key ='+this.fieldsdataofdrop[key]);
+                this.queryColum.push({ label:this.fieldsdataofdrop[key] ,fieldName:this.fieldsdataofdrop[key],type:key });
+         
+             }
+            
+
+        }
+value;
+value1;
+    get options() {
+        return [
+            { label: 'A-Z', value: 'A-Z' },
+            { label: 'Z-A', value: 'Z-A' },
+        
+        ];
+    }
+
+    handleChange1(event) {
+        this.value = event.detail.value;
+    }
+
+    get options2() {
+        return [
+            { label: '=', value: '=' },
+            { label: '<', value: '<' },
+            { label: '<=', value: '<=' },
+            { label: '>', value: '>' },
+            { label: '>=', value: '>=' },
+            { label: 'starts with', value: 'starts with' },
+            { label: 'ends with', value: 'ends with' },        
+        ];
+    }
+
+    handleChange2(event) {
+        this.value1 = event.detail.value;
+    }
+
+    showDatatable(event){
+        this.DataTableVisible = true;
+        console.log('fields='+this.fieldsdataofdrop);
+        
+         console.log( 'Query Value is'+this.queryvalue)
+        getQuery({ query : this.queryvalue})
+      .then((result) => { 
+        console.log('data ='+result);
+
+        this.data = result;
+        console.log('data ='+this.data);
+      })
+
+      .catch((error) => {
+          this.error = error;
+          this.contacts = undefined;
+      });
+}
+
+    }
+
+
+
+
+
+
