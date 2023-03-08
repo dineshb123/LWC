@@ -1,0 +1,105 @@
+<!--
+  @description       : 
+  @author            : ChangeMeIn@UserSettingsUnder.SFDoc
+  @group             : 
+  @last modified on  : 03-08-2023
+  @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
+-->
+<template>
+    <lightning-card>
+    <div class="slds-box slds-theme_default">
+        <table class="table slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered">
+            <thead>
+                <tr>
+                    <th class="" scope="col">
+                        <div class="slds-truncate" title="Account Name">Name</div>
+                      </th>
+                      <th class="" scope="col">
+                        <div class="slds-truncate" title="Account Industry">Email__c</div>
+                      </th>
+                      <th class="" scope="col">
+                          <div class="slds-truncate" title="Account Type">Progress_Type__c</div>
+                        </th>
+                </tr>
+            </thead>
+            <tbody>
+                <template for:each={accounts} for:item="acc">
+                    <tr key={acc.Id} class="trClassForValidation" data-id={acc.Progress_Type__c}>
+                        <td>{acc.Name}</td>
+                        <td>{acc.Email__c}</td>
+                        <td>
+                            {acc.Progress_Type__c}
+                        
+                        </td>
+                        </tr>
+                </template>
+            </tbody>
+        </table>
+    </div> 
+</lightning-card>
+</template>
+
+
+
+
+============================JS=========================================
+
+import { LightningElement,wire,track } from 'lwc';
+import bootstrap from '@salesforce/resourceUrl/bootstrap';
+import { loadStyle, loadScript } from 'lightning/platformResourceLoader';
+
+import fetchAccounts from '@salesforce/apex/ExampleController.fetchAccounts';
+
+
+export default class BootsrapDemo1 extends LightningElement {
+
+
+    renderedCallback() {
+
+        
+
+        Promise.all([
+            loadStyle(this, bootstrap + '/css/bootstrap.css'),
+                
+        ])
+            .then(() => {
+                var allTrClasses = this.template.querySelectorAll('.trClassForValidation');
+
+        for(var i=0 ; i<allTrClasses.length ; i++)
+        {
+            switch(allTrClasses[i].dataset.id)
+            {
+                case 'Inprogress':
+                    allTrClasses[i].classList.add('table-warning');
+                    break;
+                case 'Completed':
+                    allTrClasses[i].classList.add('table-success');
+                    break;
+                case 'failed':
+                    allTrClasses[i].classList.add('table-danger');
+                    break;
+            }
+        }
+            })
+            .catch(error => {
+                console.log('error');
+            });
+
+    }
+
+
+    @track accounts;
+   
+    @wire( fetchAccounts ) 
+    caseRecord({ error, data }) { 
+ 
+        if ( data ) { 
+ 
+            this.accounts = data; 
+ 
+        } else if ( error )
+            console.log( 'Error is ' + JSON.stringify( error ) );
+         
+    }
+
+}
